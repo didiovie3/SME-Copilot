@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,7 +11,7 @@ import { collection } from 'firebase/firestore';
 import type { Transaction, Advice } from '@/lib/types';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useTier } from '@/hooks/use-tier';
-import { Sparkles, Quote, LayoutDashboard, Lock } from 'lucide-react';
+import { Sparkles, Quote, LayoutDashboard, Lock, BarChart3, BellRing } from 'lucide-react';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UpgradePrompt } from '@/components/upgrade-prompt';
@@ -47,29 +46,42 @@ export default function SmeDashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in duration-700">
+    <div className="flex flex-col gap-12 animate-in fade-in duration-700 pb-20">
+      {/* Quick Access Area */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <LayoutDashboard className="h-5 w-5 text-primary" />
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Business Command</h2>
+          <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Business Command</h2>
         </div>
         <QuickActions />
       </div>
 
+      {/* Main Financial Metrics */}
       <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 px-1">Performance Pulse</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Performance Pulse</h2>
+          </div>
+          <span className="text-[10px] font-black uppercase text-accent bg-accent/10 px-2 py-0.5 rounded-full">All-Time Statistics</span>
+        </div>
+        <div className="w-full">
             <KpiCards transactions={transactions} isLoading={isLoading} />
         </div>
       </div>
 
+      {/* Strategic Progress Area */}
       <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 px-1">Strategic Goals</h2>
+        <div className="flex items-center gap-2 px-1">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Strategic Goals</h2>
+        </div>
         <GoalsSection transactions={transactions} isLoading={isLoading} />
       </div>
 
+      {/* Visual Analytics */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
-        <Card className="lg:col-span-7 transition-all duration-500 hover:shadow-lg hover:shadow-primary/10 border-none bg-card/50 backdrop-blur-sm overflow-hidden">
+        <Card className="lg:col-span-7 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 border-none bg-card/50 backdrop-blur-sm overflow-hidden">
           <CardHeader>
             <CardTitle className="text-lg font-bold">Cash Pulse History</CardTitle>
             <CardDescription>{isFree ? 'Last 30 days of income versus expenses.' : 'Full historical trend of income versus expenses.'}</CardDescription>
@@ -92,8 +104,12 @@ export default function SmeDashboard() {
         </Card>
       </div>
 
+      {/* Critical System Alerts */}
       <div className="space-y-4">
-         <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 px-1">Operational Alerts</h2>
+         <div className="flex items-center gap-2 px-1">
+           <BellRing className="h-5 w-5 text-destructive" />
+           <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Operational Alerts</h2>
+         </div>
          <InventoryAlerts />
       </div>
     </div>

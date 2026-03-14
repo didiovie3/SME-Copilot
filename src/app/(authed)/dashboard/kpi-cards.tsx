@@ -23,6 +23,7 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   const stats = useMemo(() => {
     if (!transactions || !hasMounted) {
       return { 
+        allTime: { income: 0, expenses: 0 },
         current: { income: 0, expenses: 0 }, 
         previous: { income: 0, expenses: 0 } 
       };
@@ -30,7 +31,7 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
 
     const today = new Date();
     
-    // Intervals
+    // Intervals for monthly trends
     const currentStart = startOfMonth(today);
     const currentEnd = endOfMonth(today);
     const previousMonthDate = subMonths(today, 1);
@@ -41,13 +42,17 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
       (acc, t) => {
         const tDate = new Date(t.timestamp);
         
-        // Current Month
+        // Accumulate All Time Totals
+        if (t.type === 'income') acc.allTime.income += t.amount;
+        else acc.allTime.expenses += t.amount;
+
+        // Current Month Stats
         if (isWithinInterval(tDate, { start: currentStart, end: currentEnd })) {
           if (t.type === 'income') acc.current.income += t.amount;
           else acc.current.expenses += t.amount;
         }
         
-        // Previous Month
+        // Previous Month Stats
         if (isWithinInterval(tDate, { start: previousStart, end: previousEnd })) {
           if (t.type === 'income') acc.previous.income += t.amount;
           else acc.previous.expenses += t.amount;
@@ -56,13 +61,14 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
         return acc;
       },
       { 
+        allTime: { income: 0, expenses: 0 },
         current: { income: 0, expenses: 0 }, 
         previous: { income: 0, expenses: 0 } 
       }
     );
   }, [transactions, hasMounted]);
 
-  const { current, previous } = stats;
+  const { allTime, current, previous } = stats;
 
   const calculateTrend = (curr: number, prev: number) => {
     if (prev <= 0) {
@@ -84,11 +90,11 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   const expenseTrend = calculateTrend(current.expenses, previous.expenses);
   const netIncomeTrend = calculateTrend(current.income - current.expenses, previous.income - previous.expenses);
 
-  const burnRate = useMemo(() => (current.income > 0 ? current.expenses / current.income : 0), [current]);
+  const burnRate = useMemo(() => (allTime.income > 0 ? allTime.expenses / allTime.income : 0), [allTime]);
   const isHighOverhead = burnRate > 0.8;
   
   const CardWrapper = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <Card className={cn("transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1)] hover:shadow-primary/10 border-none bg-card/50 backdrop-blur-sm overflow-hidden min-w-0 w-full", className)}>
+    <Card className={cn("transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] hover:shadow-primary/20 border-none bg-card/50 backdrop-blur-md overflow-hidden min-w-0 w-full min-h-[180px] flex flex-col justify-center px-2", className)}>
       {children}
     </Card>
   );
@@ -97,16 +103,16 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
 
   if (isLoading || !hasMounted) {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="w-full">
+                <Card key={i} className="w-full h-[180px] border-none bg-card/50 animate-pulse">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <Skeleton className="h-4 w-2/3" />
-                        <Skeleton className="h-4 w-4" />
+                        <Skeleton className="h-4 w-4 rounded-full" />
                     </CardHeader>
-                    <CardContent>
-                        <Skeleton className="h-7 w-1/2" />
-                        <Skeleton className="h-3 w-1/3 mt-2" />
+                    <CardContent className="space-y-3">
+                        <Skeleton className="h-10 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
                     </CardContent>
                 </Card>
             ))}
@@ -115,60 +121,63 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
       <CardWrapper>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-[10px] sm:text-sm font-medium">Total Revenue</CardTitle>
-          <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-sidebar-foreground" />
+          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Revenue</CardTitle>
+          <DollarSign className="h-4 w-4 text-primary" />
         </CardHeader>
-        <CardContent>
-          <div className="text-lg sm:text-2xl font-bold truncate" title={formatCurrency(current.income)}>
-            {formatCurrency(current.income)}
+        <CardContent className="space-y-1">
+          <div className="text-3xl font-black text-primary tracking-tight truncate" title={formatCurrency(allTime.income)}>
+            {formatCurrency(allTime.income)}
           </div>
-          <p className={`text-[10px] truncate ${revenueTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
+          <p className={`text-[10px] font-bold uppercase ${revenueTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
             {revenueTrend.label}
           </p>
         </CardContent>
       </CardWrapper>
+
       <CardWrapper>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-[10px] sm:text-sm font-medium">Total Expenses</CardTitle>
-          <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-sidebar-foreground" />
+          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Expenses</CardTitle>
+          <CreditCard className="h-4 w-4 text-primary" />
         </CardHeader>
-        <CardContent>
-          <div className="text-lg sm:text-2xl font-bold truncate" title={formatCurrency(current.expenses)}>
-            {formatCurrency(current.expenses)}
+        <CardContent className="space-y-1">
+          <div className="text-3xl font-black text-destructive tracking-tight truncate" title={formatCurrency(allTime.expenses)}>
+            {formatCurrency(allTime.expenses)}
           </div>
-          <p className={`text-[10px] truncate ${expenseTrend.isUp ? 'text-destructive' : 'text-accent'}`}>
+          <p className={`text-[10px] font-bold uppercase ${expenseTrend.isUp ? 'text-destructive' : 'text-accent'}`}>
             {expenseTrend.label}
           </p>
         </CardContent>
       </CardWrapper>
+
       <CardWrapper>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-[10px] sm:text-sm font-medium">Net Income</CardTitle>
-          <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-sidebar-foreground" />
+          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Net Income</CardTitle>
+          <TrendingUp className="h-4 w-4 text-primary" />
         </CardHeader>
-        <CardContent>
-          <div className="text-lg sm:text-2xl font-bold truncate" title={formatCurrency(current.income - current.expenses)}>
-            {formatCurrency(current.income - current.expenses)}
+        <CardContent className="space-y-1">
+          <div className="text-3xl font-black text-accent tracking-tight truncate" title={formatCurrency(allTime.income - allTime.expenses)}>
+            {formatCurrency(allTime.income - allTime.expenses)}
           </div>
-          <p className={`text-[10px] truncate ${netIncomeTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
+          <p className={`text-[10px] font-bold uppercase ${netIncomeTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
             {netIncomeTrend.label}
           </p>
         </CardContent>
       </CardWrapper>
-      <CardWrapper className={isHighOverhead ? 'border-destructive bg-destructive/10 hover:shadow-destructive/20' : ''}>
+
+      <CardWrapper className={isHighOverhead ? 'bg-destructive/5 ring-1 ring-destructive/20' : ''}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-[10px] sm:text-sm font-medium">Burn Rate</CardTitle>
-          <Flame className={`h-3 w-3 sm:h-4 sm:w-4 ${isHighOverhead ? 'text-destructive' : 'text-sidebar-foreground'}`} />
+          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Burn Rate</CardTitle>
+          <Flame className={`h-4 w-4 ${isHighOverhead ? 'text-destructive animate-pulse' : 'text-primary'}`} />
         </CardHeader>
-        <CardContent>
-          <div className={`text-lg sm:text-2xl font-bold truncate ${isHighOverhead ? 'text-destructive' : ''}`}>
+        <CardContent className="space-y-1">
+          <div className={`text-3xl font-black tracking-tight ${isHighOverhead ? 'text-destructive' : 'text-primary'}`}>
             {(burnRate * 100).toFixed(1)}%
           </div>
-          <p className={`text-[10px] truncate ${isHighOverhead ? 'text-destructive/80' : 'text-muted-foreground'}`}>
-            {isHighOverhead ? "High Overhead" : "Burn Rate"}
+          <p className={`text-[10px] font-bold uppercase ${isHighOverhead ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {isHighOverhead ? "Critical Overhead" : "Burn Rate"}
           </p>
         </CardContent>
       </CardWrapper>
