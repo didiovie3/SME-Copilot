@@ -16,7 +16,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next .firebase node_modules && npm cache clean --force",
-    "nuke": "rm -rf .next .firebase node_modules package-lock.json && npm cache clean --force && npm install"
+    "nuke": "rm -rf .next .firebase node_modules package-lock.json && npm cache clean --force && npm install",
+    "deploy": "firebase deploy --only hosting:uruvia,functions"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
