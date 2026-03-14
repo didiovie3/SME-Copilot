@@ -94,7 +94,7 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   const isHighOverhead = burnRate > 0.8;
   
   const CardWrapper = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <Card className={cn("transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] hover:shadow-primary/20 border-none bg-card/50 backdrop-blur-md overflow-hidden min-w-0 w-full min-h-[180px] flex flex-col justify-center px-2", className)}>
+    <Card className={cn("transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] hover:shadow-primary/20 border-none bg-card/50 backdrop-blur-md overflow-hidden min-w-0 w-full min-h-[220px] flex flex-col justify-center px-6", className)}>
       {children}
     </Card>
   );
@@ -105,13 +105,13 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="w-full h-[180px] border-none bg-card/50 animate-pulse">
+                <Card key={i} className="w-full h-[220px] border-none bg-card/50 animate-pulse">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <Skeleton className="h-4 w-2/3" />
                         <Skeleton className="h-4 w-4 rounded-full" />
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Skeleton className="h-10 w-3/4" />
+                        <Skeleton className="h-12 w-3/4" />
                         <Skeleton className="h-3 w-1/2" />
                     </CardContent>
                 </Card>
@@ -123,12 +123,12 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
       <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
           <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Revenue</CardTitle>
-          <DollarSign className="h-4 w-4 text-primary" />
+          <DollarSign className="h-5 w-5 text-primary" />
         </CardHeader>
-        <CardContent className="space-y-1">
-          <div className="text-3xl font-black text-primary tracking-tight truncate" title={formatCurrency(allTime.income)}>
+        <CardContent className="space-y-2 p-0 pt-2">
+          <div className="text-4xl font-black text-primary tracking-tight truncate" title={formatCurrency(allTime.income)}>
             {formatCurrency(allTime.income)}
           </div>
           <p className={`text-[10px] font-bold uppercase ${revenueTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
@@ -138,12 +138,12 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
       </CardWrapper>
 
       <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
           <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Expenses</CardTitle>
-          <CreditCard className="h-4 w-4 text-primary" />
+          <CreditCard className="h-5 w-5 text-primary" />
         </CardHeader>
-        <CardContent className="space-y-1">
-          <div className="text-3xl font-black text-destructive tracking-tight truncate" title={formatCurrency(allTime.expenses)}>
+        <CardContent className="space-y-2 p-0 pt-2">
+          <div className="text-4xl font-black text-destructive tracking-tight truncate" title={formatCurrency(allTime.expenses)}>
             {formatCurrency(allTime.expenses)}
           </div>
           <p className={`text-[10px] font-bold uppercase ${expenseTrend.isUp ? 'text-destructive' : 'text-accent'}`}>
@@ -153,12 +153,12 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
       </CardWrapper>
 
       <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
           <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Net Income</CardTitle>
-          <TrendingUp className="h-4 w-4 text-primary" />
+          <TrendingUp className="h-5 w-5 text-primary" />
         </CardHeader>
-        <CardContent className="space-y-1">
-          <div className="text-3xl font-black text-accent tracking-tight truncate" title={formatCurrency(allTime.income - allTime.expenses)}>
+        <CardContent className="space-y-2 p-0 pt-2">
+          <div className="text-4xl font-black text-accent tracking-tight truncate" title={formatCurrency(allTime.income - allTime.expenses)}>
             {formatCurrency(allTime.income - allTime.expenses)}
           </div>
           <p className={`text-[10px] font-bold uppercase ${netIncomeTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
@@ -168,12 +168,12 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
       </CardWrapper>
 
       <CardWrapper className={isHighOverhead ? 'bg-destructive/5 ring-1 ring-destructive/20' : ''}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
           <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Burn Rate</CardTitle>
-          <Flame className={`h-4 w-4 ${isHighOverhead ? 'text-destructive animate-pulse' : 'text-primary'}`} />
+          <Flame className={`h-5 w-5 ${isHighOverhead ? 'text-destructive animate-pulse' : 'text-primary'}`} />
         </CardHeader>
-        <CardContent className="space-y-1">
-          <div className={`text-3xl font-black tracking-tight ${isHighOverhead ? 'text-destructive' : 'text-primary'}`}>
+        <CardContent className="space-y-2 p-0 pt-2">
+          <div className={`text-4xl font-black tracking-tight ${isHighOverhead ? 'text-destructive' : 'text-primary'}`}>
             {(burnRate * 100).toFixed(1)}%
           </div>
           <p className={`text-[10px] font-bold uppercase ${isHighOverhead ? 'text-destructive' : 'text-muted-foreground'}`}>
