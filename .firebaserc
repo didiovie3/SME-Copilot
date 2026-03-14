@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "harbor-ie-tracker"
+  },
+  "targets": {
+    "harbor-ie-tracker": {
+      "hosting": {
+        "uruvia": [
+          "uruvia.web.app"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

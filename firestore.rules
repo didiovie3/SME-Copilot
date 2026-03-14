@@ -1,0 +1,166 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getProfile() {
+      return isSignedIn() ? get(/databases/$(database)/documents/user_profiles/$(request.auth.uid)).data : null;
+    }
+
+    function isSuperAdmin() {
+      let profile = getProfile();
+      return profile != null && (profile.role == 'superAdmin' || profile.role == 'admin');
+    }
+
+    function isAdmin() {
+      let profile = getProfile();
+      return profile != null && (
+        profile.role == 'admin' || 
+        profile.role == 'superAdmin' || 
+        profile.role == 'accountantAdmin'
+      );
+    }
+
+    function isBusinessMember(businessId) {
+      let profile = getProfile();
+      return profile != null && (profile.businessId == businessId || isAdmin());
+    }
+
+    function hasRole(businessId, roles) {
+      let profile = getProfile();
+      return profile != null && (
+        profile.businessId == businessId && (
+          profile.role in roles || 
+          (profile.role == 'owner' && 'owner' in roles) ||
+          (profile.role == 'smeOwner' && 'owner' in roles)
+        ) || isAdmin()
+      );
+    }
+
+    function hasTier(businessId, tiers) {
+      let biz = get(/databases/$(database)/documents/businesses/$(businessId)).data;
+      return biz.subscription != null && biz.subscription.tier in tiers;
+    }
+
+    // --- Global Super Admin Access ---
+    match /{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+
+    // --- Specific Rules ---
+
+    match /_metadata/counters {
+      allow read, write: if isSignedIn();
+    }
+
+    match /user_profiles/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin() || (isSignedIn() && request.query.limit <= 1); // Allow setup utility check
+      allow create: if isSignedIn();
+      allow update: if isSuperAdmin() || (isSignedIn() && request.auth.uid == userId);
+    }
+
+    match /businesses/{businessId} {
+      allow read: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
+      allow create: if isSignedIn();
+      allow update: if hasRole(businessId, ['owner']) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+
+      match /notifications/{notifId} {
+        allow read, update: if isBusinessMember(businessId);
+        allow create: if isSuperAdmin() || hasRole(businessId, ['accountant']);
+        allow delete: if isAdmin() || hasRole(businessId, ['accountant']);
+      }
+
+      match /team_members/{memberId} {
+        allow read: if isBusinessMember(businessId) || (isSignedIn() && (request.auth.token.email.lower() == resource.data.email.lower() || request.auth.uid == resource.data.uid));
+        allow update: if (isSignedIn() && request.auth.token.email.lower() == resource.data.email.lower()) || hasRole(businessId, ['owner']) || isSuperAdmin();
+        allow create, delete: if hasRole(businessId, ['owner']) || isSuperAdmin();
+      }
+
+      match /transactions/{transactionId} {
+        allow read: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
+        allow create: if isSignedIn() && isBusinessMember(businessId);
+        allow update, delete: if hasRole(businessId, ['owner', 'accountant']) || isSuperAdmin();
+      }
+
+      match /inventory_items/{inventoryItemId} {
+        allow read: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
+        allow create, update, delete: if isSignedIn() && isBusinessMember(businessId);
+      }
+
+      match /recurring_expenses/{expenseId} {
+        allow read: if isBusinessMember(businessId);
+        allow write: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+      }
+
+      match /goals/{goalId} {
+        allow read: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
+        allow write: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+      }
+
+      match /invoices/{invoiceId} {
+        allow get: if true; 
+        allow list: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
+        allow write: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+      }
+
+      match /payroll/{payrollId} {
+        allow read: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+        allow create, update: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+        allow delete: if hasRole(businessId, ['owner']) || isSuperAdmin();
+      }
+
+      match /report_reviews/{reviewId} {
+        allow read: if isBusinessMember(businessId) && hasTier(businessId, ['copilot']);
+        allow write: if isAdmin();
+      }
+
+      match /collaborationFeed/{itemId} {
+        allow read: if isBusinessMember(businessId) && hasTier(businessId, ['copilot']);
+        allow create: if (hasRole(businessId, ['accountant', 'owner']) && hasTier(businessId, ['copilot'])) || isAdmin();
+        allow update: if isBusinessMember(businessId) && hasTier(businessId, ['copilot']);
+        allow delete: if isAdmin();
+      }
+
+      match /advice/{adviceId} {
+        allow read: if isBusinessMember(businessId);
+        allow write: if isAdmin();
+      }
+
+      match /payments/{paymentId} {
+        allow read: if isBusinessMember(businessId);
+        allow write: if isSuperAdmin();
+      }
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if isSignedIn();
+      allow get, list, update, delete: if isAdmin();
+    }
+
+    match /admin_activity_log/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /support_messages/{messageId} {
+      allow read, write: if isAdmin();
+      allow create: if isSignedIn();
+    }
+
+    match /{path=**}/team_members/{memberId} {
+      allow list: if request.query.limit <= 1 || isAdmin();
+      allow get: if true;
+    }
+
+    match /{path=**}/report_reviews/{reviewId} {
+      allow list: if isAdmin();
+    }
+  }
+}

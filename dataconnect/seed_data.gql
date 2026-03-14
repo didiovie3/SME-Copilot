@@ -1,0 +1,102 @@
+mutation SeedData @auth(level: USER, insecureReason: "This operation is for seeding data and should only be run by authenticated users.") @transaction {
+  user_insertMany(data: [
+    {
+      id: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j",
+      displayName: "Alice Smith",
+      email: "alice.smith@example.com",
+      createdAt: "2023-01-01T10:00:00Z",
+      photoUrl: "https://example.com/alice.jpg"
+    },
+    {
+      id: "8c7a1e2f-3g4h-5i6j-7b1c-31405e204b2a",
+      displayName: "Bob Johnson",
+      email: "bob.johnson@example.com",
+      createdAt: "2023-01-02T11:00:00Z",
+      photoUrl: "https://example.com/bob.jpg"
+    }
+  ])
+  category_insertMany(data: [
+    {
+      id: "c4d5e6f7-8a9b-0c1d-2e3f-4a5b6c7d8e9f",
+      name: "Food",
+      createdAt: "2023-01-03T12:00:00Z",
+      description: "Expenses related to food and groceries",
+      iconUrl: "https://example.com/food_icon.png",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j"
+    },
+    {
+      id: "d5e6f7a8-b9c0-d1e2-f3a4-b5c6d7e8f9a0",
+      name: "Transportation",
+      createdAt: "2023-01-04T13:00:00Z",
+      description: "Expenses related to travel and commuting",
+      iconUrl: "https://example.com/transport_icon.png",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j"
+    },
+    {
+      id: "e6f7a8b9-c0d1-e2f3-a4b5-c6d7e8f9a0b1",
+      name: "Utilities",
+      createdAt: "2023-01-05T14:00:00Z",
+      description: "Household utility bills",
+      iconUrl: "https://example.com/utilities_icon.png",
+      userId: "8c7a1e2f-3g4h-5i6j-7b1c-31405e204b2a"
+    }
+  ])
+  expense_insertMany(data: [
+    {
+      amount: 45.75,
+      date: "2023-10-26",
+      description: "Groceries from local store",
+      createdAt: "2023-10-26T09:30:00Z",
+      notes: "Weekly grocery shopping",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j",
+      categoryId: "c4d5e6f7-8a9b-0c1d-2e3f-4a5b6c7d8e9f"
+    },
+    {
+      amount: 15.00,
+      date: "2023-10-25",
+      description: "Bus fare to work",
+      createdAt: "2023-10-25T08:00:00Z",
+      notes: "Daily commute",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j",
+      categoryId: "d5e6f7a8-b9c0-d1e2-f3a4-b5c6d7e8f9a0"
+    },
+    {
+      amount: 75.20,
+      date: "2023-10-20",
+      description: "Electricity bill",
+      createdAt: "2023-10-20T16:00:00Z",
+      notes: "Monthly bill for October",
+      userId: "8c7a1e2f-3g4h-5i6j-7b1c-31405e204b2a",
+      categoryId: "e6f7a8b9-c0d1-e2f3-a4b5-c6d7e8f9a0b1"
+    }
+  ])
+  budget_insertMany(data: [
+    {
+      amount: 500.00,
+      startDate: "2023-10-01",
+      endDate: "2023-10-31",
+      createdAt: "2023-09-28T10:00:00Z",
+      notes: "October food budget",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j",
+      categoryId: "c4d5e6f7-8a9b-0c1d-2e3f-4a5b6c7d8e9f"
+    },
+    {
+      amount: 100.00,
+      startDate: "2023-10-01",
+      endDate: "2023-10-31",
+      createdAt: "2023-09-29T11:00:00Z",
+      notes: "October transportation budget",
+      userId: "7b1c3140-5e20-4b2a-8c7a-1e2f3g4h5i6j",
+      categoryId: "d5e6f7a8-b9c0-d1e2-f3a4-b5c6d7e8f9a0"
+    },
+    {
+      amount: 150.00,
+      startDate: "2023-10-01",
+      endDate: "2023-10-31",
+      createdAt: "2023-09-30T12:00:00Z",
+      notes: "October utilities budget",
+      userId: "8c7a1e2f-3g4h-5i6j-7b1c-31405e204b2a",
+      categoryId: "e6f7a8b9-c0d1-e2f3-a4b5-c6d7e8f9a0b1"
+    }
+  ])
+}

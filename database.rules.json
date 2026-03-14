@@ -1,0 +1,17 @@
+
+{
+  "rules": {
+    "backups": {
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": "auth != null && auth.uid == $uid"
+        }
+      },
+      "admin": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}

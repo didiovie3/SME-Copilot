@@ -1,0 +1,59 @@
+query GetMyCategories @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users as it filters by the authenticated user's ID.") {
+  categories(where: { userId: { eq_expr: "auth.uid" } }) {
+    id
+    name
+    description
+    iconUrl
+    createdAt
+  }
+}
+
+mutation CreateExpense($amount: Float!, $date: Date!, $description: String!, $categoryId: UUID!) @auth(level: USER) {
+  expense_insert(
+    data: {
+      amount: $amount
+      date: $date
+      description: $description
+      categoryId: $categoryId
+      userId_expr: "auth.uid"
+      createdAt_expr: "request.time"
+    }
+  ) {
+    id
+  }
+}
+
+query GetMyExpensesByDateRange($startDate: Date!, $endDate: Date!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users as it filters by the authenticated user's ID.") {
+  expenses(
+    where: {
+      _and: [
+        { userId: { eq_expr: "auth.uid" } }
+        { date: { ge: $startDate } }
+        { date: { le: $endDate } }
+      ]
+    }
+    orderBy: [{ date: DESC }]
+  ) {
+    id
+    amount
+    date
+    description
+    category {
+      id
+      name
+    }
+  }
+}
+
+mutation UpdateCategory($id: UUID!, $name: String, $description: String, $iconUrl: String) @auth(level: USER) {
+  category_update(
+    key: { id: $id }
+    data: {
+      name: $name
+      description: $description
+      iconUrl: $iconUrl
+    }
+  ) {
+    id
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Stores individual user account details, role assignments, and approval status.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Sequential Binary ID (UI-xxxxx)" },
+        "authId": { "type": "string", "description": "Firebase Auth UID link" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "accountant", "staff", "admin"] },
+        "roleInCompany": { "type": "string", "description": "Title within the business" },
+        "businessId": { "type": "string", "description": "Sequential ID of the associated Business" },
+        "status": { "type": "string", "enum": ["pending", "active"] }
+      },
+      "required": ["id", "authId", "email", "name", "role", "status"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "type": "object",
+      "description": "Business team association record.",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "accountant", "staff"] },
+        "inviteStatus": { "type": "string", "enum": ["pending", "active"] },
+        "dateAdded": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Business": {
+      "title": "Business",
+      "type": "object",
+      "description": "Represents the core SME business profile with sequential BI-xxxxx identifier.",
+      "properties": {
+        "id": { "type": "string", "description": "Sequential Binary ID (BI-xxxxx)" },
+        "ownerId": { "type": "string", "description": "Firebase Auth UID of the creator" },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "industry": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" },
+            "salesPlatforms": { "type": "array", "items": { "type": "string" } },
+            "companySize": { "type": "string" },
+            "tin": { "type": "string" },
+            "cac": { "type": "string" },
+            "country": { "type": "string" },
+            "state": { "type": "string" },
+            "address": { "type": "string" },
+            "logoUrl": { "type": "string" }
+          }
+        },
+        "subscription": {
+          "type": "object",
+          "properties": {
+            "tier": { "type": "string", "enum": ["free", "pro", "copilot"] },
+            "status": { "type": "string" }
+          }
+        }
+      },
+      "required": ["id", "ownerId", "profile"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "type": "object",
+      "description": "Financial records with sequential TD-xxxxx identifier.",
+      "properties": {
+        "id": { "type": "string", "description": "Sequential Binary ID (TD-xxxxx)" },
+        "businessId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "categoryName": { "type": "string" },
+        "categoryGroup": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "transfer", "pos"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "description": { "type": "string" },
+        "receiptUrl": { "type": "string" },
+        "isRecurring": { "type": "boolean" }
+      },
+      "required": ["id", "ownerId", "type", "amount", "categoryName", "paymentMethod", "timestamp"]
+    },
+    "RecurringExpense": {
+      "title": "RecurringExpense",
+      "type": "object",
+      "description": "Automation templates for overheads.",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "expenseName": { "type": "string" },
+        "categoryGroup": { "type": "string" },
+        "categoryName": { "type": "string" },
+        "amount": { "type": "number" },
+        "frequency": { "type": "string", "enum": ["weekly", "monthly", "quarterly"] },
+        "nextDueDate": { "type": "string", "format": "date-time" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["expenseName", "amount", "frequency", "nextDueDate", "isActive"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "type": "object",
+      "description": "Managed goods (GD-xxxxx) or services (SV-xxxxx).",
+      "properties": {
+        "id": { "type": "string", "description": "Sequential Binary ID (GD- or SV-)" },
+        "businessId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "itemName": { "type": "string" },
+        "type": { "type": "string", "enum": ["goods", "service"] },
+        "category": { "type": "string" },
+        "currentStock": { "type": "number" },
+        "unitCost": { "type": "number" },
+        "reorderPoint": { "type": "number" },
+        "value": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "isArchived": { "type": "boolean", "default": false }
+      },
+      "required": ["id", "businessId", "ownerId", "itemName", "type", "category"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "user_profiles/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "User profile tied to Auth UID path."
+    },
+    "businesses/{businessId}": {
+      "schema": { "$ref": "#/backend/entities/Business" },
+      "description": "The root business profile identified by sequential BI ID."
+    },
+    "businesses/{businessId}/team_members/{memberId}": {
+      "schema": { "$ref": "#/backend/entities/TeamMember" },
+      "description": "Team roles and access within a business."
+    },
+    "businesses/{businessId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/backend/entities/Transaction" },
+      "description": "Sequential transaction logs."
+    },
+    "businesses/{businessId}/recurring_expenses/{expenseId}": {
+      "schema": { "$ref": "#/backend/entities/RecurringExpense" },
+      "description": "Automation templates."
+    },
+    "businesses/{businessId}/inventory_items/{itemId}": {
+      "schema": { "$ref": "#/backend/entities/InventoryItem" },
+      "description": "Sequential inventory assets."
+    },
+    "feedback/{feedbackId}": {
+      "schema": { "type": "object" },
+      "description": "Global user feedback."
+    },
+    "_metadata/counters": {
+      "schema": { "type": "object" },
+      "description": "Internal document for sequential ID management."
+    }
+  }
+}
