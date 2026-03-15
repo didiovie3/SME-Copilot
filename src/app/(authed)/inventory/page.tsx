@@ -66,6 +66,7 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UpgradePrompt } from '@/components/upgrade-prompt';
+import { cn } from '@/lib/utils';
 
 const InventoryRow = memo(({ 
   item, 
