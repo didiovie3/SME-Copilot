@@ -120,6 +120,25 @@
         "isArchived": { "type": "boolean", "default": false }
       },
       "required": ["id", "businessId", "ownerId", "itemName", "type", "category"]
+    },
+    "Client": {
+      "title": "Client",
+      "type": "object",
+      "description": "Customer record for a specific business.",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "businessName": { "type": "string" },
+        "type": { "type": "string", "enum": ["individual", "business"] },
+        "address": { "type": "string" },
+        "notes": { "type": "string" },
+        "dateAdded": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "businessId", "ownerId", "name", "phone", "type", "dateAdded"]
     }
   },
   "auth": {
@@ -149,6 +168,10 @@
     "businesses/{businessId}/inventory_items/{itemId}": {
       "schema": { "$ref": "#/backend/entities/InventoryItem" },
       "description": "Sequential inventory assets."
+    },
+    "businesses/{businessId}/clients/{clientId}": {
+      "schema": { "$ref": "#/backend/entities/Client" },
+      "description": "Business customer database."
     },
     "feedback/{feedbackId}": {
       "schema": { "type": "object" },
