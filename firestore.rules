@@ -105,6 +105,10 @@ service cloud.firestore {
         allow create, update, delete: if isSignedIn() && isBusinessMember(businessId);
       }
 
+      match /payrollStaff/{staffId} {
+        allow read, write: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();
+      }
+
       match /goals/{goalId} {
         allow read: if isSignedIn() && (isBusinessMember(businessId) || isAdmin());
         allow write: if hasRole(businessId, ['owner', 'accountant']) || isAdmin();

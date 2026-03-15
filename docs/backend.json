@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -83,6 +84,27 @@
       },
       "required": ["id", "ownerId", "type", "amount", "categoryName", "paymentMethod", "timestamp"]
     },
+    "PayrollStaff": {
+      "title": "PayrollStaff",
+      "type": "object",
+      "description": "Employee directory record for payroll management.",
+      "properties": {
+        "id": { "type": "string", "description": "Sequential Binary ID (UI-xxxxx)" },
+        "businessId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "role": { "type": "string" },
+        "department": { "type": "string" },
+        "monthlyGrossSalary": { "type": "number" },
+        "bankName": { "type": "string" },
+        "accountNumber": { "type": "string" },
+        "paymentDate": { "type": "number" },
+        "employmentType": { "type": "string", "enum": ["full-time", "part-time", "contract"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "dateAdded": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "businessId", "fullName", "role", "monthlyGrossSalary", "status"]
+    },
     "RecurringExpense": {
       "title": "RecurringExpense",
       "type": "object",
@@ -160,6 +182,10 @@
     "businesses/{businessId}/transactions/{transactionId}": {
       "schema": { "$ref": "#/backend/entities/Transaction" },
       "description": "Sequential transaction logs."
+    },
+    "businesses/{businessId}/payrollStaff/{staffId}": {
+      "schema": { "$ref": "#/backend/entities/PayrollStaff" },
+      "description": "Employee directory for the business."
     },
     "businesses/{businessId}/recurring_expenses/{expenseId}": {
       "schema": { "$ref": "#/backend/entities/RecurringExpense" },
