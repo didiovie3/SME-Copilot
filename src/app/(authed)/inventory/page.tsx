@@ -82,7 +82,7 @@ const InventoryRow = memo(({
   const needsReorder = isGoods && !item.isArchived && (item.currentStock || 0) <= (item.reorderPoint || 0);
   
   return (
-    <TableRow className={cn("hidden md:table-row", needsReorder ? 'bg-destructive/5' : '')}>
+    <TableRow className={cn(needsReorder ? 'bg-destructive/5' : '')}>
       <TableCell>
         <div className="size-10 relative rounded-md overflow-hidden bg-muted border border-border flex items-center justify-center">
           {item.imageUrl ? (
@@ -183,7 +183,7 @@ const InventoryMobileCard = memo(({
 
   return (
     <div className={cn(
-      "md:hidden p-4 relative group active:bg-muted/50 transition-colors",
+      "p-4 relative group active:bg-muted/50 transition-colors",
       needsReorder ? "bg-destructive/5" : ""
     )}>
       <div className="flex gap-4">
@@ -431,7 +431,7 @@ export default function InventoryPage() {
             </TabsList>
             
             <TabsContent value="active" className="m-0">
-              <div className="sm:rounded-lg border-y sm:border overflow-hidden divide-y sm:divide-none">
+              <div className="sm:rounded-lg border-y sm:border overflow-hidden">
                 {/* Desktop Table View */}
                 <Table className="hidden md:table">
                   <TableHeader className="bg-muted/30">
@@ -516,7 +516,7 @@ export default function InventoryPage() {
             </TabsContent>
 
             <TabsContent value="archived" className="m-0">
-              <div className="sm:rounded-lg border-y sm:border overflow-hidden divide-y sm:divide-none">
+              <div className="sm:rounded-lg border-y sm:border overflow-hidden">
                 <Table className="hidden md:table">
                   <TableHeader className="bg-muted/30">
                     <TableRow>

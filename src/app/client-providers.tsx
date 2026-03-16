@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from "@/components/ui/toaster";
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 /**
  * Client-only wrapper for global providers.
@@ -29,6 +30,7 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <FirebaseClientProvider>
+        <FirebaseErrorListener />
         {children}
       </FirebaseClientProvider>
       <Toaster />

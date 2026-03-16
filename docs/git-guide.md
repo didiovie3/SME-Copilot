@@ -1,6 +1,6 @@
 # Uruvia Git Workflow Guide
 
-If your GitHub repository is only showing the README, follow these steps to push your entire codebase.
+If your GitHub repository is only showing the README, it means your local files haven't been "staged" or "committed" yet. Follow these steps to push your entire codebase.
 
 ## 🚀 Pushing All Code (First Time or After Changes)
 
@@ -16,19 +16,16 @@ Run these commands in order from your terminal:
    git add .
    ```
 
-3. **Verify Staging**: Run status again. You should see a long list of "new files" or "modified" files in green.
-   ```bash
-   git status
-   ```
+3. **Verify Staging**: Run `git status` again. You should see a long list of "new files" or "modified" files in green.
 
 4. **Commit the Codebase**: Save the snapshot locally.
    ```bash
-   git commit -m "Initial codebase push: including src, components, and logic"
+   git commit -m "Pushing full project source including src and docs"
    ```
 
 5. **Push to GitHub**:
    ```bash
-   git push origin main
+   git push
    ```
 
 ## 🛠 Troubleshooting
@@ -39,6 +36,6 @@ This happens if you haven't run `git commit`. Git only pushes **commits**, not j
 ### "Updates were rejected"?
 If GitHub has changes you don't have locally, run:
 ```bash
-git pull --rebase origin main
-git push origin main
+git pull --rebase
+git push
 ```
