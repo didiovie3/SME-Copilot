@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -7,7 +8,7 @@ import {
   useDoc, 
   useMemoFirebase, 
   updateDocumentNonBlocking,
-  addDocumentNonBlocking
+  setDocumentNonBlocking
 } from '@/firebase';
 import { doc, collection } from 'firebase/firestore';
 import type { Invoice, Business } from '@/lib/types';
@@ -27,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InvoicePDFView } from '@/components/invoice-pdf-view';
 import { Badge } from '@/components/ui/badge';
+import { getNextId } from '@/lib/id-generator';
 
 export default function InvoiceDetailPage() {
   const params = useParams();
@@ -50,28 +52,36 @@ export default function InvoiceDetailPage() {
     if (!firestore || !businessId || !invoice || !profile) return;
     setIsUpdating(true);
 
-    const invRef = doc(firestore, `businesses/${businessId}/invoices`, invoice.id);
-    updateDocumentNonBlocking(invRef, { status: 'paid' });
+    try {
+      // Use sequential TC (Credit) ID for income
+      const txId = await getNextId(firestore, 'income');
+      const invRef = doc(firestore, `businesses/${businessId}/invoices`, invoice.id);
+      const txRef = doc(firestore, `businesses/${businessId}/transactions`, txId);
 
-    // Ledger Sync
-    const transactionsRef = collection(firestore, `businesses/${businessId}/transactions`);
-    addDocumentNonBlocking(transactionsRef, {
-      businessId,
-      ownerId: profile.authId || profile.id,
-      type: 'income',
-      amount: invoice.total,
-      category: 'Invoice Payment',
-      categoryName: 'Invoice Payment',
-      categoryGroup: 'Revenue',
-      paymentMethod: invoice.paymentMethod,
-      timestamp: new Date().toISOString(),
-      description: `Payment for Invoice ${invoice.invoiceNumber}`,
-      clientName: invoice.client.name,
-      id: `TD-PAID-${invoice.id.split('-')[1]}`
-    });
+      updateDocumentNonBlocking(invRef, { status: 'paid' });
 
-    toast({ title: "Invoice Paid", description: "Payment recorded in ledger." });
-    setIsUpdating(false);
+      // Ledger Sync
+      setDocumentNonBlocking(txRef, {
+        businessId,
+        ownerId: profile.authId || profile.id,
+        type: 'income',
+        amount: invoice.total,
+        category: 'Invoice Payment',
+        categoryName: 'Invoice Payment',
+        categoryGroup: 'Revenue',
+        paymentMethod: invoice.paymentMethod,
+        timestamp: new Date().toISOString(),
+        description: `Payment for Invoice ${invoice.invoiceNumber}`,
+        clientName: invoice.client.name,
+        id: txId
+      });
+
+      toast({ title: "Invoice Paid", description: "Payment recorded in ledger." });
+    } catch (e) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to record payment.' });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleShare = () => {

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -43,7 +44,7 @@ import {
   useCollection, 
   useMemoFirebase, 
   updateDocumentNonBlocking,
-  addDocumentNonBlocking
+  setDocumentNonBlocking
 } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import type { Invoice, Business } from '@/lib/types';
@@ -56,6 +57,7 @@ import InvoiceDialog from './invoice-dialog';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { getNextId } from '@/lib/id-generator';
 
 export default function InvoicesPage() {
   const { profile, business, isLoading: isProfileLoading } = useUserProfile();
@@ -89,12 +91,15 @@ export default function InvoicesPage() {
   const handleMarkAsPaid = async (invoice: Invoice) => {
     if (!firestore || !businessId || !profile) return;
 
+    // Use sequential TC (Credit) ID for income
+    const txId = await getNextId(firestore, 'income');
     const invoiceRef = doc(firestore, `businesses/${businessId}/invoices`, invoice.id);
+    const txRef = doc(firestore, `businesses/${businessId}/transactions`, txId);
+
     updateDocumentNonBlocking(invoiceRef, { status: 'paid' });
 
     // Auto-create corresponding income transaction
-    const transactionsRef = collection(firestore, `businesses/${businessId}/transactions`);
-    addDocumentNonBlocking(transactionsRef, {
+    setDocumentNonBlocking(txRef, {
       businessId,
       ownerId: profile.authId || profile.id,
       type: 'income',
@@ -106,7 +111,7 @@ export default function InvoicesPage() {
       timestamp: new Date().toISOString(),
       description: `Payment for Invoice ${invoice.invoiceNumber}`,
       clientName: invoice.client.name,
-      id: `TD-PAID-${invoice.id.split('-')[1]}` // Link IDs loosely
+      id: txId
     });
 
     toast({ title: "Invoice Paid", description: "Ledger updated with income transaction." });
