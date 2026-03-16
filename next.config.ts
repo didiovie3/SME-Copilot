@@ -4,7 +4,7 @@ const nextConfig = {
   allowedDevOrigins: [
     '*.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev',
   ],
-  output: 'standalone',
+  output: 'export',
   env: {
     NEXT_PUBLIC_BUILD_ID: Date.now().toString(),
   },

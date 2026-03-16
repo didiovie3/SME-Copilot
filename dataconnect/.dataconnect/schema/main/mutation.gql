@@ -1,0 +1,450 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `Budget` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  budget_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Budget_Data!
+  ): Budget_KeyOutput! @fdc_generated(from: "Budget", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Category` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  category_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Category_Data!
+  ): Category_KeyOutput! @fdc_generated(from: "Category", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Expense` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  expense_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Expense_Data!
+  ): Expense_KeyOutput! @fdc_generated(from: "Expense", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `User` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `Budget` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  budget_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Budget_Data!]!
+  ): [Budget_KeyOutput!]! @fdc_generated(from: "Budget", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Category` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  category_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Category_Data!]!
+  ): [Category_KeyOutput!]! @fdc_generated(from: "Category", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Expense` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  expense_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Expense_Data!]!
+  ): [Expense_KeyOutput!]! @fdc_generated(from: "Expense", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `User` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `Budget` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Budget`.
+  """
+  budget_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Budget_Data!
+  ): Budget_KeyOutput! @fdc_generated(from: "Budget", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Category` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Category`.
+  """
+  category_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Category_Data!
+  ): Category_KeyOutput! @fdc_generated(from: "Category", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Expense` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Expense`.
+  """
+  expense_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Expense_Data!
+  ): Expense_KeyOutput! @fdc_generated(from: "Expense", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `User` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `Budget` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Budget`.
+  """
+  budget_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Budget_Data!]!
+  ): [Budget_KeyOutput!]! @fdc_generated(from: "Budget", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Category` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Category`.
+  """
+  category_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Category_Data!]!
+  ): [Category_KeyOutput!]! @fdc_generated(from: "Category", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Expense` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Expense`.
+  """
+  expense_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Expense_Data!]!
+  ): [Expense_KeyOutput!]! @fdc_generated(from: "Expense", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `User` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `Budget` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Budget` or `null` if not found.
+  """
+  budget_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Budget_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Budget_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Budget_Data!
+  ): Budget_KeyOutput @fdc_generated(from: "Budget", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Category` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Category` or `null` if not found.
+  """
+  category_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Category_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Category_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Category_Data!
+  ): Category_KeyOutput @fdc_generated(from: "Category", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Expense` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Expense` or `null` if not found.
+  """
+  expense_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Expense_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Expense_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Expense_Data!
+  ): Expense_KeyOutput @fdc_generated(from: "Expense", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `User` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `User` or `null` if not found.
+  """
+  user_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: User_Data!
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `Budget` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  budget_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Budget_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Budget_Data!
+  ): Int! @fdc_generated(from: "Budget", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Category` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  category_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Category_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Category_Data!
+  ): Int! @fdc_generated(from: "Category", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Expense` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  expense_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Expense_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Expense_Data!
+  ): Int! @fdc_generated(from: "Expense", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `User` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  user_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: User_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: User_Data!
+  ): Int! @fdc_generated(from: "User", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `Budget` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  budget_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Budget_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Budget_FirstRow
+  ): Budget_KeyOutput @fdc_generated(from: "Budget", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Category` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  category_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Category_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Category_FirstRow
+  ): Category_KeyOutput @fdc_generated(from: "Category", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Expense` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  expense_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Expense_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Expense_FirstRow
+  ): Expense_KeyOutput @fdc_generated(from: "Expense", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `User` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  user_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `Budget` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  budget_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Budget_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Budget", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Category` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  category_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Category_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Category", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Expense` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  expense_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Expense_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Expense", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `User` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  user_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: User_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "User", purpose: DELETE_MULTIPLE)
+}
