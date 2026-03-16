@@ -1,6 +1,5 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import QuickActions from './quick-actions';
 import KpiCards from './kpi-cards';
 import CashPulseChart from './cash-pulse-chart';
@@ -8,18 +7,18 @@ import InventoryAlerts from './inventory-alerts';
 import GoalsSection from './goals-section';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import type { Transaction, Advice } from '@/lib/types';
+import type { Transaction } from '@/lib/types';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useTier } from '@/hooks/use-tier';
-import { Sparkles, Quote, LayoutDashboard, Lock, BarChart3, BellRing } from 'lucide-react';
-import { format } from 'date-fns';
+import { LayoutDashboard } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UpgradePrompt } from '@/components/upgrade-prompt';
 import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function SmeDashboard() {
   const { profile, isLoading: isProfileLoading } = useUserProfile();
-  const { isFree, isProOrAbove } = useTier();
+  const { isFree } = useTier();
   const firestore = useFirestore();
   const businessId = profile?.businessId;
 
@@ -33,10 +32,9 @@ export default function SmeDashboard() {
 
   if (isProfileLoading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 p-4">
         <Skeleton className="h-10 w-48" />
-        <div className="grid gap-6 md:grid-cols-4">
-          <Skeleton className="h-32 w-full" />
+        <div className="grid gap-6 md:grid-cols-3">
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />
@@ -46,52 +44,48 @@ export default function SmeDashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-12 animate-in fade-in duration-700 pb-20">
-      {/* Quick Access Area */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 px-1">
-          <LayoutDashboard className="h-5 w-5 text-primary" />
-          <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Business Command</h2>
-        </div>
-        <QuickActions />
-      </div>
-
-      {/* Main Financial Metrics */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
-            <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Performance Pulse</h2>
+    <div className="flex flex-col gap-10 animate-in fade-in duration-700 pb-24 bg-[#F8FAFC] -m-4 p-4 min-h-screen">
+      {/* Header Area */}
+      <div className="flex items-center justify-between px-2 pt-2">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary rounded-xl shadow-lg shadow-primary/20">
+            <LayoutDashboard className="h-6 w-6 text-white" />
           </div>
-          <span className="text-[10px] font-black uppercase text-accent bg-accent/10 px-2 py-0.5 rounded-full">All-Time Statistics</span>
-        </div>
-        <div className="w-full">
-            <KpiCards transactions={transactions} isLoading={isLoading} />
+          <h1 className="text-2xl font-black text-slate-900">Business Command</h1>
         </div>
       </div>
 
-      {/* Strategic Progress Area */}
+      {/* Quick Actions */}
+      <QuickActions />
+
+      {/* 1. Performance Pulse (KPIs) */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 px-1">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Strategic Goals</h2>
-        </div>
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">Performance Pulse</h2>
+        <KpiCards transactions={transactions} isLoading={isLoading} />
+      </div>
+
+      {/* 2. Strategic Goals */}
+      <div className="space-y-4">
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">Strategic Goals</h2>
         <GoalsSection transactions={transactions} isLoading={isLoading} />
       </div>
 
-      {/* Visual Analytics */}
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
-        <Card className="lg:col-span-7 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 border-none bg-card/50 backdrop-blur-sm overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold">Cash Pulse History</CardTitle>
-            <CardDescription>{isFree ? 'Last 30 days of income versus expenses.' : 'Full historical trend of income versus expenses.'}</CardDescription>
+      {/* 3. Cash Pulse History (Visual Analytics) */}
+      <div className="space-y-4">
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">Cash Pulse History</h2>
+        <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-black text-slate-900">Monthly Cashflow</CardTitle>
+            <CardDescription className="text-xs font-semibold text-slate-400">
+              {isFree ? 'Last 30 days of income versus expenses.' : 'Full historical trend comparison.'}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pl-2 relative">
+          <CardContent className="p-2 relative">
             <div className={cn("transition-all", isFree && "grayscale opacity-80")}>
               <CashPulseChart transactions={transactions} isLoading={isLoading} />
             </div>
             {isFree && (
-              <div className="absolute inset-0 flex items-center justify-center p-6 bg-background/5 backdrop-blur-[1px]">
+              <div className="absolute inset-0 flex items-center justify-center p-6 bg-white/40 backdrop-blur-[2px]">
                 <UpgradePrompt 
                   variant="overlay"
                   featureName="Full History Visuals"
@@ -104,13 +98,10 @@ export default function SmeDashboard() {
         </Card>
       </div>
 
-      {/* Critical System Alerts */}
+      {/* 4. Operational Alerts */}
       <div className="space-y-4">
-         <div className="flex items-center gap-2 px-1">
-           <BellRing className="h-5 w-5 text-destructive" />
-           <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground/60">Operational Alerts</h2>
-         </div>
-         <InventoryAlerts />
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">System Status</h2>
+        <InventoryAlerts />
       </div>
     </div>
   );

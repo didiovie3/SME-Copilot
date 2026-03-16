@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Target, TrendingUp, Sparkles, Pencil, ArrowUpCircle } from 'lucide-react';
+import { Target, Sparkles, Pencil, ArrowUpCircle } from 'lucide-react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useTier } from '@/hooks/use-tier';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -14,11 +14,14 @@ import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import GoalDialog from './goal-dialog';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface GoalsSectionProps {
   transactions: Transaction[] | null;
   isLoading: boolean;
 }
+
+const SIGNAL_BLUE = "#135BEC";
 
 export default function GoalsSection({ transactions, isLoading: isTransactionsLoading }: GoalsSectionProps) {
   const { profile, isProfileComplete, isLoading: isProfileLoading } = useUserProfile();
@@ -66,71 +69,75 @@ export default function GoalsSection({ transactions, isLoading: isTransactionsLo
   const aiMessage = useMemo(() => {
     if (!activeGoal) return "You haven't set a revenue goal for this month yet. Setting a target helps Uruvia guide your growth strategy!";
     
-    if (progress >= 100) return `Phenomenal work! You've exceeded your ₦${activeGoal.amount.toLocaleString()} target by ${((currentMonthRevenue / activeGoal.amount - 1) * 100).toFixed(1)}%. You're dominating the market this month!`;
+    if (progress >= 100) return `Phenomenal work! You've exceeded your ₦${activeGoal.amount.toLocaleString()} target. You're dominating the market!`;
     
     if (progress > 75) return `So close! You're at ${progress.toFixed(1)}% of your goal. One final push in sales could help you cross the line early.`;
     
-    if (progress > 40) return `Steady progress! You've reached ${progress.toFixed(1)}% of your monthly revenue target. Keep your momentum high!`;
-    
-    return `You've achieved ${progress.toFixed(1)}% of your ₦${activeGoal.amount.toLocaleString()} goal. There's still time to reach your target—review your sales channels to boost engagement!`;
+    const remaining = activeGoal.amount - currentMonthRevenue;
+    return `You're currently ₦${remaining.toLocaleString()} away from your goal. Sales are showing steady momentum—keep going!`;
   }, [activeGoal, progress, currentMonthRevenue]);
 
   const isLoading = isProfileLoading || isTransactionsLoading || isGoalsLoading;
 
   if (isLoading) {
-    return <Skeleton className="h-[200px] w-full" />;
+    return <Skeleton className="h-[240px] w-full rounded-2xl" />;
   }
 
   return (
     <>
-      <Card className="transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-card/50 backdrop-blur-sm overflow-hidden group">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+      <Card className="border-none shadow-sm bg-white overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
           <div className="space-y-1">
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
+            <CardTitle className="text-xl font-black text-slate-900 flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Monthly Revenue Target
+              Strategic Goals
             </CardTitle>
-            <CardDescription>Tracking your climb to ₦{activeGoal?.amount.toLocaleString() || '0'}</CardDescription>
+            <CardDescription className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Target: ₦{activeGoal?.amount.toLocaleString() || '0'}
+            </CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {isFree && goals && goals.length >= 1 && (
-              <Button asChild variant="outline" size="sm" className="h-8 gap-2 border-primary/20 text-primary">
+              <Button asChild variant="outline" size="sm" className="h-7 text-[10px] font-black uppercase tracking-tighter border-primary/20 text-primary px-3 rounded-full">
                 <Link href="/pricing">
-                  <ArrowUpCircle className="h-4 w-4" />
-                  Unlock 5 Goals
+                  Upgrade
                 </Link>
               </Button>
             )}
             <Button 
-              variant="ghost" 
+              variant="secondary" 
               size="sm" 
-              className="h-8 gap-2 hover:bg-primary/10" 
+              className="h-7 w-7 p-0 rounded-full bg-slate-100 hover:bg-slate-200" 
               onClick={() => setIsDialogOpen(true)}
               disabled={!isProfileComplete}
             >
-              <Pencil className="h-4 w-4" />
-              {activeGoal ? 'Update Goal' : 'Set Goal'}
+              <Pencil className="h-3 w-3 text-slate-600" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm font-medium">
-              <span className="text-muted-foreground">Progress: ₦{currentMonthRevenue.toLocaleString()}</span>
-              <span className={progress >= 100 ? "text-accent font-bold" : "text-primary"}>{progress.toFixed(1)}%</span>
+        <CardContent className="space-y-6 pt-0">
+          <div className="space-y-3">
+            <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Monthly Revenue Target</span>
+              <span className="text-sm font-black text-primary">{progress.toFixed(1)}% Achieved</span>
             </div>
-            <Progress value={progress} className="h-3 bg-primary/10" />
+            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+               <div 
+                className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${progress}%` }}
+               />
+            </div>
           </div>
 
-          <div className="relative p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10">
-            <div className="flex gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg h-fit">
-                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50">
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-0.5">
+                <Sparkles className="h-4 w-4 text-primary" />
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-bold uppercase tracking-widest text-primary/60">Copilot Insight</p>
-                <p className="text-sm font-medium leading-relaxed italic text-foreground/80">
-                  "{aiMessage}"
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Copilot Insight</p>
+                <p className="text-xs font-semibold leading-relaxed text-slate-700">
+                  {aiMessage}
                 </p>
               </div>
             </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, CreditCard, Flame, TrendingUp } from 'lucide-react';
+import { DollarSign, CreditCard, TrendingUp } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useEffect, useMemo } from 'react';
@@ -42,7 +42,7 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
       (acc, t) => {
         const tDate = new Date(t.timestamp);
         
-        // Accumulate All Time Totals
+        // Accumulate All Time Totals (Used for Dashboard Summary)
         if (t.type === 'income') acc.allTime.income += t.amount;
         else acc.allTime.expenses += t.amount;
 
@@ -82,37 +82,47 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
     return {
       value: Math.abs(diff).toFixed(1),
       isUp: diff >= 0,
-      label: `${diff >= 0 ? '+' : '-'}${Math.abs(diff).toFixed(1)}% from last month`
+      label: `${diff >= 0 ? '+' : '-'}${Math.abs(diff).toFixed(1)}% vs last month`
     };
   };
 
   const revenueTrend = calculateTrend(current.income, previous.income);
   const expenseTrend = calculateTrend(current.expenses, previous.expenses);
-  const netIncomeTrend = calculateTrend(current.income - current.expenses, previous.income - previous.expenses);
+  const netWorth = allTime.income - allTime.expenses;
 
-  const burnRate = useMemo(() => (allTime.income > 0 ? allTime.expenses / allTime.income : 0), [allTime]);
-  const isHighOverhead = burnRate > 0.8;
-  
-  const CardWrapper = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <Card className={cn("transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] hover:shadow-primary/20 border-none bg-card/50 backdrop-blur-md overflow-hidden min-w-0 w-full min-h-[220px] flex flex-col justify-center px-6", className)}>
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      maximumFractionDigits: 0,
+    }).format(val).replace('NGN', '₦');
+  };
+
+  const CardWrapper = ({ children, className, isPrimary = false }: { children: React.ReactNode, className?: string, isPrimary?: boolean }) => (
+    <Card className={cn(
+      "relative transition-all duration-300 hover:scale-[1.02] border-none shadow-sm overflow-hidden min-h-[160px] flex flex-col justify-center",
+      isPrimary ? "bg-white ring-1 ring-primary/5 shadow-primary/10" : "bg-white",
+      className
+    )}>
+      {isPrimary && (
+        <div className="absolute top-0 right-0 p-8 -mr-8 -mt-8 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+      )}
       {children}
     </Card>
   );
 
-  const formatCurrency = (val: number) => `₦${val.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
-
   if (isLoading || !hasMounted) {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-            {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="w-full h-[220px] border-none bg-card/50 animate-pulse">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className="w-full h-[160px] border-none bg-white animate-pulse shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <Skeleton className="h-4 w-2/3" />
-                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-5 w-5 rounded-full" />
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Skeleton className="h-12 w-3/4" />
-                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-10 w-2/3" />
+                        <Skeleton className="h-3 w-1/3" />
                     </CardContent>
                 </Card>
             ))}
@@ -121,64 +131,67 @@ export default function KpiCards({ transactions, isLoading }: KpiCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-      <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Revenue</CardTitle>
-          <DollarSign className="h-5 w-5 text-primary" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+      {/* Total Revenue */}
+      <CardWrapper isPrimary>
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardTitle className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-500">Total Revenue</CardTitle>
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <DollarSign className="h-4 w-4 text-primary" />
+          </div>
         </CardHeader>
-        <CardContent className="space-y-2 p-0 pt-2">
-          <div className="text-4xl font-black text-primary tracking-tight truncate" title={formatCurrency(allTime.income)}>
+        <CardContent className="space-y-1">
+          <div className="text-3xl font-black text-slate-900 tracking-tight leading-none">
             {formatCurrency(allTime.income)}
           </div>
-          <p className={`text-[10px] font-bold uppercase ${revenueTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
-            {revenueTrend.label}
-          </p>
+          <div className={cn(
+            "text-[10px] font-bold flex items-center gap-1",
+            revenueTrend.isUp ? "text-emerald-500" : "text-rose-500"
+          )}>
+            {revenueTrend.isUp ? '↑' : '↓'} {revenueTrend.label}
+          </div>
         </CardContent>
       </CardWrapper>
 
+      {/* Total Expenses */}
       <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Total Expenses</CardTitle>
-          <CreditCard className="h-5 w-5 text-primary" />
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardTitle className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-500">Total Expenses</CardTitle>
+          <div className="p-2 bg-rose-50 rounded-lg">
+            <CreditCard className="h-4 w-4 text-rose-500" />
+          </div>
         </CardHeader>
-        <CardContent className="space-y-2 p-0 pt-2">
-          <div className="text-4xl font-black text-destructive tracking-tight truncate" title={formatCurrency(allTime.expenses)}>
+        <CardContent className="space-y-1">
+          <div className="text-3xl font-black text-slate-900 tracking-tight leading-none">
             {formatCurrency(allTime.expenses)}
           </div>
-          <p className={`text-[10px] font-bold uppercase ${expenseTrend.isUp ? 'text-destructive' : 'text-accent'}`}>
-            {expenseTrend.label}
-          </p>
+          <div className={cn(
+            "text-[10px] font-bold flex items-center gap-1",
+            expenseTrend.isUp ? "text-rose-500" : "text-emerald-500"
+          )}>
+            {expenseTrend.isUp ? '↑' : '↓'} {expenseTrend.label}
+          </div>
         </CardContent>
       </CardWrapper>
 
+      {/* Net Income */}
       <CardWrapper>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Net Income</CardTitle>
-          <TrendingUp className="h-5 w-5 text-primary" />
-        </CardHeader>
-        <CardContent className="space-y-2 p-0 pt-2">
-          <div className="text-4xl font-black text-accent tracking-tight truncate" title={formatCurrency(allTime.income - allTime.expenses)}>
-            {formatCurrency(allTime.income - allTime.expenses)}
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardTitle className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-500">Net Income</CardTitle>
+          <div className="p-2 bg-emerald-50 rounded-lg">
+            <TrendingUp className="h-4 w-4 text-emerald-500" />
           </div>
-          <p className={`text-[10px] font-bold uppercase ${netIncomeTrend.isUp ? 'text-accent' : 'text-destructive'}`}>
-            {netIncomeTrend.label}
-          </p>
-        </CardContent>
-      </CardWrapper>
-
-      <CardWrapper className={isHighOverhead ? 'bg-destructive/5 ring-1 ring-destructive/20' : ''}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Burn Rate</CardTitle>
-          <Flame className={`h-5 w-5 ${isHighOverhead ? 'text-destructive animate-pulse' : 'text-primary'}`} />
         </CardHeader>
-        <CardContent className="space-y-2 p-0 pt-2">
-          <div className={`text-4xl font-black tracking-tight ${isHighOverhead ? 'text-destructive' : 'text-primary'}`}>
-            {(burnRate * 100).toFixed(1)}%
+        <CardContent className="space-y-1">
+          <div className={cn(
+            "text-3xl font-black tracking-tight leading-none",
+            netWorth >= 0 ? "text-emerald-600" : "text-rose-600"
+          )}>
+            {formatCurrency(netWorth)}
           </div>
-          <p className={`text-[10px] font-bold uppercase ${isHighOverhead ? 'text-destructive' : 'text-muted-foreground'}`}>
-            {isHighOverhead ? "Critical Overhead" : "Burn Rate"}
-          </p>
+          <div className="text-[10px] font-bold text-slate-400">
+            Current Profitability
+          </div>
         </CardContent>
       </CardWrapper>
     </div>
