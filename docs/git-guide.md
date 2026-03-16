@@ -1,49 +1,44 @@
 # Uruvia Git Workflow Guide
 
-This guide outlines the standard procedure for pushing code updates from your local environment to the GitHub repository.
+If your GitHub repository is only showing the README, follow these steps to push your entire codebase.
 
-## 🚀 Standard Update (Daily Workflow)
+## 🚀 Pushing All Code (First Time or After Changes)
 
-Run these three commands in order whenever you want to save your progress to GitHub:
+Run these commands in order from your terminal:
 
-1. **Stage Changes**: Prepares all modified files for the commit.
+1. **Check Status**: See which files Git is currently ignoring or hasn't noticed.
+   ```bash
+   git status
+   ```
+
+2. **Track All Files**: This tells Git to start watching every file in your project.
    ```bash
    git add .
    ```
 
-2. **Commit**: Creates a labeled snapshot of your work.
+3. **Verify Staging**: Run status again. You should see a long list of "new files" or "modified" files in green.
    ```bash
-   git commit -m "Brief description of your changes"
+   git status
    ```
 
-3. **Push**: Uploads your labeled snapshot to GitHub.
+4. **Commit the Codebase**: Save the snapshot locally.
    ```bash
-   git push
+   git commit -m "Initial codebase push: including src, components, and logic"
    ```
 
-## 🛠 Troubleshooting Common Issues
+5. **Push to GitHub**:
+   ```bash
+   git push origin main
+   ```
 
-### 1. Permission Denied (Public Key)
-If you get a permission error, ensure your GitHub CLI is authenticated:
-```bash
-gh auth login
-```
+## 🛠 Troubleshooting
 
-### 2. "Updates were rejected" (Remote changes exist)
-If GitHub has changes that you don't have locally, pull them first:
+### "Everything up-to-date" but files are missing?
+This happens if you haven't run `git commit`. Git only pushes **commits**, not just saved files. Make sure you run step 4 above.
+
+### "Updates were rejected"?
+If GitHub has changes you don't have locally, run:
 ```bash
 git pull --rebase origin main
-```
-Then try your `git push` again.
-
-### 3. Check Status
-If you are unsure what state your files are in:
-```bash
-git status
-```
-
-### 4. View History
-To see your previous commits:
-```bash
-git log --oneline -n 10
+git push origin main
 ```

@@ -1,0 +1,9 @@
+{
+	"appId": "com.uruvia.app",
+	"appName": "Uruvia",
+	"webDir": "out",
+	"server": {
+		"androidScheme": "https",
+		"cleartext": true
+	}
+}
