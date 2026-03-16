@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     // During development on emulator, uncomment the line below and use your machine's local IP or hosted URL
-    // url: 'https://uruvia.web.app',
+    // url: 'https://app.uruvia.com',
     cleartext: true
   }
 };

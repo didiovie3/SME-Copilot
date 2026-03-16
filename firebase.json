@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "uruvia",
-    "source": ".",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -12,9 +12,8 @@
       "package-lock.json",
       "*.log"
     ],
-    "frameworksBackend": {
-      "region": "us-central1"
-    }
+    "cleanUrls": true,
+    "trailingSlash": true
   },
   "firestore": {
     "database": "(default)",

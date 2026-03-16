@@ -6,7 +6,8 @@
     "harbor-ie-tracker": {
       "hosting": {
         "uruvia": [
-          "uruvia.web.app"
+          "uruvia.web.app",
+          "app.uruvia.com"
         ]
       }
     }
