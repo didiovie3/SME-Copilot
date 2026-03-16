@@ -24,9 +24,8 @@ import { cn } from '@/lib/utils';
 /**
  * Global Admin Sidebar
  * Standalone navigation for platform management.
- * Does not provide links back to the user dashboard to maintain context isolation.
  */
-export function AdminSidebar() {
+export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
@@ -66,7 +65,6 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-[240px] h-screen bg-[#0D1B2A] flex flex-col shrink-0 border-r border-white/10 z-50">
-      {/* Brand Header */}
       <div className="p-6 border-b border-white/5">
         <div className="flex items-center gap-3">
           <div className="size-8 rounded-lg bg-white/10 flex items-center justify-center">
@@ -79,10 +77,10 @@ export function AdminSidebar() {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
@@ -94,14 +92,13 @@ export function AdminSidebar() {
                   : "text-slate-400 hover:text-white hover:bg-white/5"
               )}
             >
-              <item.icon className={cn("size-4", isActive ? "text-[#22c55e]" : "text-current")} />
+              <Icon className={cn("size-4", isActive ? "text-[#22c55e]" : "text-current")} />
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer / Account */}
       <div className="p-4 border-t border-white/5 space-y-4">
         {profile && (
           <div className="px-2 space-y-1">

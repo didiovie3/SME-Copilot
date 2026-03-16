@@ -48,21 +48,22 @@ export default function AdminOverviewPage() {
   // Only initiate listeners if authorized
   const isAuth = !!(user && isAdmin);
 
-  // 1. Total Businesses
   const businessesRef = useMemoFirebase(
     () => (firestore && isAuth ? collection(firestore, 'businesses') : null),
     [firestore, isAuth]
   );
   const { data: businesses, isLoading: isBusinessesLoading } = useCollection<Business>(businessesRef);
 
-  // 2. Active This Month (last 30 days)
   const activeBusinessesQuery = useMemoFirebase(
-    () => (firestore && isAuth ? query(collection(firestore, 'businesses'), where('lastActiveAt', '>=', subDays(new Date(), 30).toISOString())) : null),
+    () => {
+      if (!firestore || !isAuth) return null;
+      const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
+      return query(collection(firestore, 'businesses'), where('lastActiveAt', '>=', thirtyDaysAgo));
+    },
     [firestore, isAuth]
   );
   const { data: activeBusinesses } = useCollection<Business>(activeBusinessesQuery);
 
-  // 3. Lists
   const recentlyJoinedQuery = useMemoFirebase(
     () => (firestore && isAuth ? query(collection(firestore, 'businesses'), orderBy('createdAt', 'desc'), limit(5)) : null),
     [firestore, isAuth]
@@ -74,6 +75,8 @@ export default function AdminOverviewPage() {
     
     return businesses.reduce((acc, b) => {
       const tier = b.subscription?.tier || (b as any).tier || 'free';
+      const monthlyAmount = b.subscription?.monthlyAmount || (b as any).monthlyAmount || 0;
+
       if (tier === 'free') acc.free++;
       if (tier === 'pro') {
         acc.pro++;
@@ -81,7 +84,7 @@ export default function AdminOverviewPage() {
       }
       if (tier === 'copilot') {
         acc.copilot++;
-        acc.mrr += (b.subscription?.monthlyAmount || (b as any).monthlyAmount || 0);
+        acc.mrr += (Number(monthlyAmount) || 0);
       }
       return acc;
     }, { free: 0, pro: 0, copilot: 0, mrr: 0 });
