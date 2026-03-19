@@ -287,8 +287,8 @@ export default function TransactionDialog({ businessId, ownerId, type, open, onO
     setIsSaving(true);
     
     try {
-      // Generate sequential binary ID for the FIRST transaction
-      const tdId = await getNextId(firestore, 'transaction');
+      // Generate sequential ID based on type (TC for income, TD for expense)
+      const tdId = await getNextId(firestore, type);
       const transactionsCollectionRef = collection(firestore, `businesses/${businessId}/transactions`);
 
       // If it's an inventory sale, update the stock for all items

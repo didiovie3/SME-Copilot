@@ -44,6 +44,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getNextId } from '@/lib/id-generator';
 
 interface PayrollRunViewProps {
   businessId: string;
@@ -168,12 +169,15 @@ export function PayrollRunView({ businessId, profile, staff, isCopilot, selected
         return;
       }
 
+      // Generate sequential TD (Debit) ID for expense
+      const txId = await getNextId(firestore, 'expense');
+      const txRef = doc(firestore, `businesses/${businessId}/transactions`, txId);
+
       const batch = writeBatch(firestore);
-      const txRef = doc(collection(firestore, `businesses/${businessId}/transactions`));
 
       // Transaction Log
       batch.set(txRef, {
-        id: txRef.id,
+        id: txId,
         businessId,
         ownerId: profile.authId || profile.id,
         type: 'expense',
@@ -199,7 +203,7 @@ export function PayrollRunView({ businessId, profile, staff, isCopilot, selected
         otherDeductions: d.other,
         netPay,
         status: 'processed',
-        transactionId: txRef.id,
+        transactionId: txId,
         processedAt: new Date().toISOString(),
         processedBy: profile.name,
         month: selectedMonth
