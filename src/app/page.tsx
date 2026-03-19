@@ -66,19 +66,19 @@ export default function LoginPage() {
 
       if (userProfileSnap.exists()) {
         const userProfile = userProfileSnap.data() as UserProfile;
-        
+
         if (userProfile.status === 'pending') {
           setError('Your account is pending admin approval.');
           await auth.signOut();
         } else {
           toast({ title: 'Welcome back!', description: "You're now logged in." });
-          
+
           // Role-Based Redirect Logic
-          const isAdmin = 
-            userProfile.role === 'superAdmin' || 
+          const isAdmin =
+            userProfile.role === 'superAdmin' ||
             userProfile.role === 'accountantAdmin' ||
             userProfile.role === 'admin';
-            
+
           router.push(isAdmin ? '/admin/overview' : '/dashboard');
         }
       } else {
@@ -89,7 +89,7 @@ export default function LoginPage() {
     } catch (e: any) {
       console.error('Login Error:', e);
       let errorMessage = 'An unexpected error occurred.';
-      
+
       if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
         errorMessage = 'Invalid email or password. Please verify your credentials.';
       } else if (e.code === 'auth/too-many-requests') {
@@ -97,7 +97,7 @@ export default function LoginPage() {
       } else {
         errorMessage = e.message || 'Check your connection.';
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -211,12 +211,12 @@ export default function LoginPage() {
                       </Dialog>
                     </div>
                     <div className="relative">
-                      <Input 
-                        id="password" 
+                      <Input
+                        id="password"
                         name="password"
-                        type={showPassword ? "text" : "password"} 
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        required 
+                        required
                         disabled={isLoading}
                         className="pr-10"
                       />
@@ -240,10 +240,10 @@ export default function LoginPage() {
                     {isLoading ? 'Authenticating...' : 'Enter Dashboard'} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   <div className="mt-4 text-center text-xs">
-                      New enterprise?{' '}
-                      <Link href="/signup" className="underline font-bold text-primary">
-                          Register your business
-                      </Link>
+                    New enterprise?{' '}
+                    <Link href="/signup" className="underline font-bold text-primary">
+                      Register your business
+                    </Link>
                   </div>
                 </form>
               </div>
